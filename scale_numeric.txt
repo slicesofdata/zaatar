@@ -1,0 +1,6 @@
+# scale numeric cols
+scale_numeric <- function(x) {
+  x %>% 
+  dplyr::mutate_if(is.numeric, function(y) as.vector(scale(y)))
+}
+# dat_scale <- dat %>% scale_numeric()

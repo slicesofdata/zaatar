@@ -1,0 +1,30 @@
+# determine whether a file is opened
+file.opened <- function(path) {
+  suppressWarnings(
+    "try-error" %in% class(
+      try(file(path, 
+               open = "w"), 
+          silent = TRUE
+      )
+    )
+  )
+}
+file_opened <- file.opened
+
+if.file.opened <- function(x, func = NULL) {
+    if (file.opened(x)) {
+        message(x, "\n... Exists but is opened. Cannot save.")
+    } else {
+        #!is.null(func) {
+             message("NULL")
+        #}
+    }
+}
+if_file_opened <- if.file.opened
+
+# save the full file
+file.opened(paste0(dat_Dir,"/cct2-full.sav"))
+
+write_sav_if_open <- function(x, path, compress = F) { 
+   if (!file_opened(path)) {  haven::write_sav(x, path, compress = compress)  }  
+}

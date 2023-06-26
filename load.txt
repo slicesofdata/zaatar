@@ -1,0 +1,6 @@
+source("X:/Progs/R/R-Portable/mypackages/zaatar Scripts/mailit.R")
+source("X:/Progs/R/R-Portable/mypackages/zaatar Scripts/means.txt")
+source("X:/Progs/R/R-Portable/mypackages/zaatar Scripts/file.opened.txt")
+source("X:/Progs/R/R-Portable/mypackages/zaatar Scripts/ggPlots.txt")
+source("X:/Progs/R/R-Portable/mypackages/zaatar Scripts/model_tables.txt")
+source("X:/Progs/R/R-Portable/mypackages/zaatar Scripts/saving.txt")

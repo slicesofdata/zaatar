@@ -1,0 +1,83 @@
+#library(tidyverse)
+#library(kableExtra)
+#library(pixiedust)
+#library(magrittr)
+
+# dependent packages
+dep = c("kableExtra", "magrittr", "pixiedust", "tidyverse"); pkgs = dep[!(dep %in% installed.packages()[,"Package"])]
+if(length(pkgs)) install.packages(pkgs, dep = T)
+rm(dep)
+
+kableMod <- function(x, caption = "", round = 3) {
+  # this function cleans up a returned ANOVA or linear model in kable format
+  # x = model or fitted model
+    # if lm 
+    if (any(agrep("lm(", x$call))) {
+    kMod = pixiedust::dust(x) %>%
+      pixiedust::sprinkle(col = 2:4, round = round) %>%
+      pixiedust::sprinkle(col = 5, fn = quote(pixiedust::pvalString(value))) %>%
+      pixiedust::sprinkle_colnames(
+        term = "Term",
+        estimate = "Estimate",
+        std.error = "SE",
+        statistic = "T-statistic",
+        p.value = "P-value")
+    } 
+    # if ANOVA model 
+    if (any(agrep("aov(", x$call))) {
+    kMod = pixiedust::dust(x) %>%
+      pixiedust::sprinkle(col = 2:6, round = round) %>%
+      pixiedust::sprinkle(col = 6, fn = quote(pixiedust::pvalString(value))) %>%
+      pixiedust::sprinkle_colnames(
+        term = "Term",
+        df = "DF",
+        sumsq = "SS",
+        meansq = "MS",
+        #estimate = "Estimate",
+        #std.error = "SE",
+        statistic = "F-statistic",
+        p.value = "P-value") 
+    } 
+  kableExtra::kbl(kMod, caption = caption) %>%
+  kableExtra::kable_styling() %>%
+ return(list(mod = x, table = kMod))
+}
+aov.kable <- kableMod
+lm.kable  <- kableMod
+
+#x1 = lm(mpg ~ qsec + factor(am) + wt + factor(gear), data = mtcars) 
+#x2 = aov(mpg ~ qsec + factor(am) + wt + factor(gear), data = mtcars) 
+
+#kableMod(x1, caption = "Model")
+#kableMod(lm(mpg ~ qsec + factor(am) + wt + factor(gear), data = mtcars), caption = "Model")
+#kableMod(x2, caption = "Model")
+
+
+
+reacTable <- function(data, groupBy = NULL, 
+                  sort = "desc", 
+                  colors = c("firebrick1", "gold", "limegreen"),
+                  sort_var = NULL,
+                  compact = T, 
+                  showSortable = T, 
+                  showPageSizeOptions = T,
+                  resizable = T, 
+                  searchable = T, 
+                  pagination = F,
+                  highlight = T
+                  ) { 
+  react_table <- reactable::reactable(data, 
+                       groupBy = groupBy, 
+                       compact = compact,
+                       showSortable = showSortable,
+                       showPageSizeOptions = showPageSizeOptions,
+                       resizable = resizable,
+                       searchable = searchable,
+                       highlight = highlight,
+                       pagination = pagination,  # display all rows on one page
+                       defaultSortOrder = sort,  # sort by descending order
+                       defaultSorted = sort_var, # sort by var
+                       defaultColDef = reactable::colDef(
+                         cell = reactablefmtr::data_bars(data, colors)))
+  return(react_table)
+} # reacTable(iris, colors = "white")

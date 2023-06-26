@@ -1,0 +1,34 @@
+csvfiles_to_dataframe <- function(
+  dat_dir      = NULL, 
+  pattern.keep = NULL,
+  pattern.omit = 'PARTIC|partic|agg', 
+  minsize      = 50) {
+  
+  if (is.null(dat_dir) | is.null(pattern.keep)) {
+    message(paste0("No directory or string pattern passed to function."))
+  } else {
+    
+    if (!require("magrittr", character.only = TRUE)) { install.packages("magrittr", dependencies = TRUE)}
+    #if (!require("dplyr", character.only = TRUE))    { install.packages("dplyr", dependencies = TRUE)}
+    library(magrittr) # load for pipe
+    
+    # clean file list
+    files = list.files(dat_dir, ".csv", full.names = T) %>%
+      .[grepl(pattern.keep, .) == T] %>%
+      .[grepl(pattern.omit, .) == F] %>%
+      .[file.info(.)$size > minsize]
+    
+    # read files and bind list to data frame
+    data = files %>% 
+      lapply(read.csv) %>%
+      dplyr::bind_rows() %>%
+      #dplyr::filter(!dplyr::across(dplyr::everything(), is.na)) # remove if all cols NA
+    
+    return(list(file.names = files, data = data))
+  }
+}
+
+#D = csvfiles_to_dataframe(dat_dir2, pattern.keep = "exp2", pattern.omit = 'PARTIC|partic|agg')
+#D = csvfiles_to_dataframe(dat_dir2, pattern.omit = 'PARTIC|partic|agg')
+#D$files
+#D$data

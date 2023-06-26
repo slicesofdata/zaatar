@@ -1,0 +1,16 @@
+add_dir_to_envpath <- function(
+  newPath = "C:\\Users\\gcook\\Sync\\Progs\\_install\\Xpdf"
+  ) {
+  if (!is.null(newPath)) {
+    if (dir.exists(newPath)) {        # if the path exists
+      envPath = (Sys.getenv("PATH"))  # get env Path
+    
+      if (!grepl(newPath, envPath)) { # if newPath is not in envPath, add it to front and set
+        Sys.setenv(PATH = paste(newPath, Sys.getenv("PATH"), sep =";"))
+      }
+    
+    return(Sys.getenv("PATH"))        # return new envPath
+    } else {
+    message("'newPath' missing newPath")
+}
+add_dir_to_envpath()

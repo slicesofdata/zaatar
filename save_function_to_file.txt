@@ -1,0 +1,12 @@
+save_function_to_file <- 
+function (x, filename = NULL, extension = ".txt", writedir = getwd()) 
+{
+    function_name = deparse(match.call()$x)
+    if (is.null(filename)) {
+        filename = function_name
+        filename = paste0(writedir, "/", filename, extension)
+    }
+    filename = gsub("//", "/", filename)
+    func_string = append(paste0(function_name, " <- "), deparse(dput(x)))
+    writeLines(text = func_string, filename)
+}

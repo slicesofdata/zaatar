@@ -1,0 +1,145 @@
+## Summarizes data
+breakdown <- function(x, vars = NULL) {
+  
+  # dependent packages
+  dep = c("dplyr", "DescTools", "magrittr", "moments") 
+  pkgs = dep[!(dep %in%      installed.packages()[,"Package"])]
+  if (length(pkgs)) install.packages(pkgs, dep = T)
+  library(magrittr)
+  
+  # if a vector is passed
+  if (is.vector(x)) {
+    var_name = deparse(substitute(x))
+    var_name = sub(".*\\$", "", var_name)
+    desc = data.frame(x = x, var = var_name)
+    
+    desc %>% 
+     #dplyr::group_by(var) %>% 
+     dplyr::summarise(
+       n    = length(na.omit(x)),
+       mean = mean(na.omit(x)),
+       mean.trim = mean(DescTools::Trim(na.omit(x), trim = .1)),
+       sem  = sd(na.omit(x))/sqrt(length(na.omit(x))), 
+       sd   = sd(na.omit(x)),
+       var  = var(na.omit(x)),
+       median = median(na.omit(x)),
+       mad  = mad(na.omit(x)),
+       min  = min(na.omit(x)),
+       max  = max(na.omit(x)),
+       skew = moments::skewness(na.omit(x)),
+       kurt = moments::kurtosis(na.omit(x))
+       ) -> desc
+
+    desc$variable = var_name
+    count = dim(desc)[2]
+    desc = as.data.frame(desc[, c(count, 1:count - 1) ])
+  }
+  
+  return(desc)
+}
+#breakdown(DAT$Age)
+
+breakdownMult <- function(x, vars = NULL) {
+  
+  # dependent packages
+  dep = c("dplyr", "DescTools", "magrittr", "moments"); pkgs = dep[!(dep %in% installed.packages()[,"Package"])]
+  if(length(pkgs)) install.packages(pkgs, dep = T)
+  library(magrittr)
+  
+  d = NULL
+  desc = NULL  
+
+  if (is.vector(x)) {
+    var_name = deparse(substitute(data))
+    var_name = sub(".*\\$", "", var_name)
+    d = data.frame(x = data, var = var_name)  
+  }
+
+  if (is.data.frame(data)) {
+  d = x
+  if (!is.null(vars)) {
+    d = d %>% dplyr::select_(.dots = vars)
+  }
+  nums = d %>% dplyr::select_if(., is.numeric) %>% names()
+
+  d = x[,nums]
+
+  d %>% t() %>% as.data.frame() -> desc
+  desc %>% 
+    dplyr::summarise(
+     n    = apply(., 1,   FUN = function(x) { length(na.omit(x)) }),
+     mean = apply(., 1,   FUN = function(x) { mean(na.omit(x)) }),
+     mean.trim = apply(., 1, FUN=function(x) { mean(DescTools::Trim(na.omit(x), trim = .1))}),
+     sem  = apply(., 1, FUN=function(x) { sd(na.omit(x))/sqrt(length(na.omit(x))) }), 
+     sd   = apply(., 1,   FUN = function(x) { sd(na.omit(x)) }),
+     var  = apply(., 1,   FUN = function(x) { var(na.omit(x)) }),
+     median = apply(., 1, FUN = function(x) { median(na.omit(x)) }),
+     mad  = apply(., 1,   FUN = function(x) { mad(na.omit(x)) }),
+     min  = apply(., 1,   FUN = function(x) { min(na.omit(x)) }),
+     max  = apply(., 1,   FUN = function(x) { max(na.omit(x)) }),
+     skew = apply(., 1,   FUN = function(x) { moments::skewness(na.omit(x)) }),
+     kurt = apply(., 1,   FUN = function(x) { moments::kurtosis(na.omit(x)) })
+      ) -> desc
+
+    desc$variable = names(d)
+    count = dim(desc)[2]
+    return(as.data.frame(desc[, c(count, 1:count - 1) ]))
+  } 
+}
+#breakdownMult(data_frame, vars = c("col1", "col2"))
+
+
+means <- function(data, 
+                  x = NULL, by = NULL, filter = NULL, trim = .1, dec = 3) {
+  # summarizes a data frame
+  # dependent packages
+  dep = c("dplyr", "DescTools", "magrittr"); pkgs = dep[!(dep %in% installed.packages()[,"Package"])]
+  if(length(pkgs)) install.packages(pkgs, dep = T)
+  library(magrittr)
+
+  #dplyr::select_(data, as.name(x))
+  # manipulate the data frame
+  if (is.data.frame(data)) {
+    
+    data = data %>% 
+      dplyr::group_by_at(by) %>%
+      dplyr::summarise(
+        n = dplyr::n(),
+        mean = round(mean(.data[[x]], na.rm = T),dec),
+        mean.trim = round(mean(DescTools::Trim(na.omit(.data[[x]]), trim = trim)),dec),
+        mdn = round(median(.data[[x]], na.rm = T),dec),
+        sum = sum(.data[[x]], na.rm = T),
+        sd = round(sd(.data[[x]], na.rm = T),dec),
+        se = round(sd(.data[[x]], na.rm = T) / sqrt(length(na.omit(.data[[x]]))),dec),
+        skew = round(moments::skewness(.data[[x]], na.rm = T),dec),
+        kurt = round(moments::kurtosis(.data[[x]], na.rm = T),dec),
+        min = round(min(.data[[x]], na.rm = T),dec),
+        max = round(max(.data[[x]], na.rm = T),dec),
+        mad = round(mad(.data[[x]], na.rm = T),dec)
+      )
+  }
+  if (is.vector(data)) {
+    var_name = deparse(substitute(data))
+    var_name = sub(".*\\$", "", var_name)
+    data = data.frame(x = data, var = var_name)
+    
+    data = data %>% 
+      dplyr::group_by(var) %>%
+      dplyr::summarise(
+        n = dplyr::n(),
+        mean = round(mean(x, na.rm = T),dec),
+        mean.trim = round(mean(DescTools::Trim(na.omit(x), trim = trim)),dec),
+        mdn = round(median(x, na.rm = T),dec),
+        sum = sum(x, na.rm = T), 
+        sd = round(sd(x, na.rm = T),dec),
+        se = round(sd(x, na.rm = T) / sqrt(length(na.omit(x) ) ),dec),
+        skew = round(moments::skewness(x, na.rm = T),dec),
+        kurt = round(moments::kurtosis(x, na.rm = T),dec),
+        min = round(min(x, na.rm = T),dec),
+        max = round(max(x, na.rm = T),dec),
+        mad = round(mad(x, na.rm = T),dec)
+      )
+  }
+  return(data)
+}
+breakdownBy <- means

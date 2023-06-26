@@ -1,0 +1,10 @@
+add_id_to_model = function(model, id_by = NULL) {
+  m = model[["model"]]
+  m = arrange(m, m[[id_by]])
+  groups = length(unique(m[, id_by]))
+  m = m %>% 
+    mutate(., id = rep(seq(1:(dim(m)[1]/groups)), groups)) %>%
+    arrange(., id)
+ return(m)
+}
+# add_id_to_model(lm_stroop, "trialtype") 

@@ -1,0 +1,1 @@
+view <- function(df, rows = F, show = 100,...) { library(DT); DT::datatable(df, rownames = rows, options = list(pageLength = show)) }

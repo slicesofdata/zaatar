@@ -1,0 +1,10 @@
+
+get_functions_from_file <- function(filename) {
+# Get all functions from a source file. Create new enviroment
+# source the functions into them and use ls() to extract names.
+  e = new.env()
+  source(filename, local = e)
+  return(ls(envir = e))
+}
+
+

@@ -1,0 +1,19 @@
+###########################################################################
+# dependencies
+list_of_pkgs <- c("rstudioapi")
+pkgs <- list_of_pkgs[!(list_of_pkgs %in% installed.packages()[,"Package"])]
+if(length(pkgs)) install.packages(pkgs, dep = T)
+###########################################################################
+
+pathSet = function() {
+    # return paths for 
+    p1 = rstudioapi::getActiveDocumentContext()$path
+    p3 = gsub(".Rmd", "", basename(p1))
+    p1 = gsub(basename(p1), "", p1)
+    p2 = gsub("R/", "Data/", p1) # main dir for writing
+    p4 = gsub("R/", "", p1)
+    return(list(R_Dir = p1, 
+                Data_Dir = p2,
+                proj_name = p3,
+                proj_dir = p4))
+}

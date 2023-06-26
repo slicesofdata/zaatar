@@ -1,0 +1,51 @@
+lapply_csv <- function(
+  file.list = NULL, # pass a list of file paths
+  dir       = NULL, # get file paths from this dir
+  ext       = ".csv",
+  names_as_letters   = F
+  ) {
+  
+  lists = NULL
+  # get file list for extension
+  if ( !is.null(dir) ) {
+    file.list = list.files(dir, full.names = T)[grep(ext, list.files(dir))]
+  }
+
+  # clean the file list
+  file.list = file.list[grep(paste0("*\\",ext), file.list)]
+  
+  # read all files with extension if they exist
+  if (length(file.list) > 0) {
+    # read ad put into list
+    if (ext == ".csv") {
+      lists = lapply(file.list, read.csv)
+    }
+    if (ext == ".tsv") {
+      lists = lapply(file.list, FUN = function(x) { read.table(x, sep = "\t") })
+    }
+    if (ext == ".rds") {
+      file.list = file.list[grep( ".rds|.RDS|.Rds", file.list)]
+      lists = lapply(file.list, readRDS)
+    }
+    if (ext == ".xlsx") {
+      file.list = file.list[grep(".xlsx|.XLSX", file.list)]
+      lists = suppressMessages(lapply(file.list, readxl::read_xlsx))
+    }
+    if (ext == ".xls") {
+      file.list = file.list[grep(".xls|.XLS", file.list)]
+      file.list = file.list[!grep(".xlsx", file.list)]
+      if (length(file.list) > 0) { 
+        lists = suppressMessages(lapply(file.list, readxl::read_xls))
+      } else { message("There were no files with that extension.") }
+    }
+
+    # names the list items
+    if (!is.null(lists)) {
+        names(lists) = file.list
+        if (names_as_letters) { names(lists) = toupper(LETTERS[1:length(file.list)]) }
+    }
+
+  } else { message("There were no files with that extension.")}
+  
+  return(lists) 
+} # lapply_csv(dir = getwd(), ext = ".xlsx", names_as_letters = F)

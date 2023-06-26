@@ -1,0 +1,17 @@
+package_check <- function(
+  package.list = NULL, 
+  load = F) {
+  
+  if (!is.null(package.list)) {
+    lapply(
+      package.list,
+      FUN = function(x) {
+        if (!require(x, character.only = TRUE)) {
+          install.packages(x, dependencies = TRUE)
+      
+          if (load) { library(x, character.only = TRUE) }
+       }}
+    )}
+  }
+
+# invisible(package_check(c("ggplot2"), load = F))

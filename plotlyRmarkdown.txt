@@ -1,0 +1,18 @@
+# fixes issue with plotting to plotly in Rmarkdown rendering
+
+ggplot2_plotly <- function(ggplot) {
+  # convert
+  plotly::ggplotly(ggplot) # convert to a plotly plot
+}
+
+plotly_2Rmd <- function(plotly) {
+  # render plotly for Rmd
+  htmltools::tagList(list(plotly)) # 
+}
+
+ggplot_2plotly_2Rmd <- function(ggplot) {
+  # render plotly for Rmd
+  htmltools::tagList(list(plotly::ggplotly(ggplot))) # 
+}
+plotDown <- ggplot_2plotly_2Rmd
+rmdPlot <- ggplot_2plotly_2Rmd

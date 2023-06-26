@@ -1,0 +1,15 @@
+my.packages <- function() {
+    `%notin%` <- Negate(`%in%`)
+    pkgs = as.data.frame(installed.packages()[,c(1,3:4)])
+    pkgs = pkgs[is.na(pkgs$Priority),1:2, drop = F]
+    pkgs = as.vector(as.character(pkgs$Package))
+    return(pkgs) }
+
+# get the package list and copy if desired.
+# presonally specific 
+# write the package list to file 
+my.packages.save <- function(
+    file = "C:/Users/gcook/Sync/Progs/R/R-Portable/mypackages/my_package_list.csv") 
+    {
+    write.table(my.packages(), file = file, sep = ",", row.names = F, col.names = F)
+}
